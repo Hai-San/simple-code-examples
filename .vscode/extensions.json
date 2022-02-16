@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "2gua.rainbow-brackets",
+        "naumovs.color-highlight",
+        "editorconfig.editorconfig",
+        "aaron-bond.better-comments",
+        "ritwickdey.liveserver",
+        "stylelint.vscode-stylelint",
+        "dbaeumer.vscode-eslint",
+    ]
+}

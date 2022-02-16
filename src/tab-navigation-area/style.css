@@ -1,0 +1,19 @@
+.main {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.container {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+
+	padding: 12px;
+	margin-top: 3vh;
+
+	border: 2px solid black;
+	border-radius: 4px;
+
+	gap: 8px;
+}

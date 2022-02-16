@@ -1,0 +1,25 @@
+
+.modal_background {
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal_container {
+    align-items: center;
+}
+
+.modal_box {
+    max-width: 100%;
+    width: 800px;
+    padding: 32px;
+    background-color: #ffffff;
+}
+
+.modal_button_close {
+    top: 8px;
+    right: 8px;
+    font-size: 20px;
+}
+
+.modal_content {
+    height: 250px;
+}

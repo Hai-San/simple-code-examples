@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple modal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="custom-style.css">
+</head>
+
+<body>
+    <!-- Button used to open modal -->
+    <button class="js_myCustomModal_open">Open modal</button>
+
+    <!-- Main HTML structure of modal START -->
+    <div id="myCustomModal" class="modal" aria-modal="true" role="dialog">
+        <div class="modal_container">
+            <div class="modal_background js_myCustomModal_close"></div>
+            <div class="modal_box">
+                <!-- Button used to close modal -->
+                <button class="modal_button_close js_myCustomModal_close" aria-label="Close modal">
+                    x
+                </button>
+                <div class="modal_content">
+                    Any content
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main HTML structure of modal END -->
+</body>
+<script src="main.js"></script>
+<script src="use-case.js"></script>
+
+</html>
