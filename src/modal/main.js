@@ -89,7 +89,7 @@ class SimpleModal {
     }
 
     /**
-     * * Adicionar ouvinte no teclado Escape para fechar o modal
+     * * Adds a listener to ESC key to close the modal
      */
     addListenerToEscKey() {
         document.addEventListener('keydown', (e) => {
