@@ -8,5 +8,5 @@ To use any of the examples, copy and paste the code into your project and adapt 
 
 ### Examples list
 
-- [Modal](https://github.com/MartDSam/simple-code-examples/src/modal)
-- [Tab navigation area](https://github.com/MartDSam/simple-code-examples/src/tab-navigation-area)
+- [Modal](https://github.com/MartDSam/simple-code-examples/tree/main/src/modal)
+- [Tab focus area](https://github.com/MartDSam/simple-code-examples/tree/main/src/tab-focus-area)
