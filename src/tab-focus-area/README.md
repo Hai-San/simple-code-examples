@@ -3,4 +3,4 @@ Script that forces TAB navigation within a specific area. Navigation will loop w
 
 ### Main files:
 
-- [JS](https://github.com/MartDSam/simple-code-examples/blob/main/src/tab-navigation-area/main.js)
+- [JS](https://github.com/MartDSam/simple-code-examples/blob/main/src/tab-focus-area/main.js)
