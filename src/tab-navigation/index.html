@@ -10,6 +10,32 @@
 </head>
 
 <body>
+    <div class="tabNav" id="tabNav">
+        <nav class="tabNav_header">
+            <div class="tabNav_scroller">
+                <div class="tabNav_scrollArea js_tabNav_scrollArea">
+                    <div aria-orientation="horizontal" class="tabNav_scrollContent" role="tablist">
+                        <button aria-controls="example_01" aria-selected="true" class="tabNav_button is_active"
+                            id="tabExample_01" role="tab"></button>
+                        <button aria-controls="example_02" aria-selected="false"
+                            class="tabNav_button is_loadingRequired" id="tabExample_02" role="tab"></button>
+                        <button aria-controls="example_03" aria-selected="false" class="tabNav_button"
+                            id="tabExample_03" role="tab"></button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="tabNav_content">
+            <div class="courseDetails_content_list">
+                <span aria-labelledby="tabExample_01" class="tabNav_content_item is_active" id="example_01"
+                    role="tabpanel" tabindex="0"></span>
+                <span aria-labelledby="tabExample_02" class="tabNav_content_item" id="example_02" role="tabpanel"
+                    tabindex="0"></span>
+                <span aria-labelledby="tabExample_03" class="tabNav_content_item" id="example_03" role="tabpanel"
+                    tabindex="0"></span>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="main.js"></script>
 

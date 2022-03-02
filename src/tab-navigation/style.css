@@ -1,0 +1,87 @@
+.tabNav_header {
+	display: flex;
+
+	width: 100%;
+}
+
+.tabNav_scroller {
+	display: block;
+	overflow-y: hidden;
+
+	width: 100%;
+}
+
+.tabNav_scrollArea {
+	display: flex;
+	overflow-x: auto;
+
+	width: 100%;
+}
+
+.tabNav_scrollContent {
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	flex: 1 0 auto;
+}
+
+.tabNav_button {
+
+	@extend %font_14_7_static;
+
+	padding-bottom: $p-xxxs;
+
+	color: $color-text;
+	border-bottom: $p-nano solid transparent;
+
+	cursor: pointer;
+
+	&:not(:first-of-type) {
+		margin-left: $p-md;
+	}
+
+	@include active {
+		border-bottom-color: $color-secondary-pure;
+
+		cursor: default;
+	}
+
+	@include interaction_full {
+		border-bottom-color: $color-secondary-pure;
+	}
+}
+
+.tabNav_content {
+	display: flex;
+	justify-content: center;
+
+	width: 100%;
+	padding: $v-md 0px;
+
+	background-color: $color-background;
+}
+
+.tabNav_content_item {
+	outline: none;
+
+	@include interaction_focus_visible {
+		outline: none;
+	}
+}
+
+.tabNav_loading {
+	align-items: center;
+	justify-content: center;
+
+	width: 100%;
+}
+
+[role='tabpanel'] {
+	display: none;
+
+	@include active {
+		display: flex;
+	}
+}
