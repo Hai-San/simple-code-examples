@@ -1,0 +1,20 @@
+.tabNav_button {
+	min-width: 250px;
+}
+
+.tabNav_button:not(:first-of-type) {
+	margin-left: 4px;
+}
+
+.tabNav_header {
+	padding: 4px;
+	margin-bottom: 8px;
+
+	border: 1px solid black;
+}
+
+.tabNav_content {
+	padding: 8px;
+
+	border: 1px solid black;
+}

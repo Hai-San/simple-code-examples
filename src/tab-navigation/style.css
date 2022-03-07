@@ -8,6 +8,7 @@
 
 .tabNav_header {
 	display: flex;
+	box-sizing: border-box;
 
 	width: 100%;
 }
@@ -45,7 +46,7 @@
 
 .tabNav_content {
 	display: flex;
-	justify-content: center;
+	box-sizing: border-box;
 
 	width: 100%;
 }

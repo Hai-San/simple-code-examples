@@ -1,7 +1,7 @@
 /**
  * * Este módulo é responsável por criar uma navegação entre TABS dentro de uma página.
  */
-export default class TabNav {
+class TabNav {
     constructor() {
         this.createCustomEvents();
 
@@ -11,25 +11,36 @@ export default class TabNav {
     /**
      * * Utilizado iniciar um componente de navegação por TAB
      * @param {object}
-     * @param {string} containerId ID do container principal
+     * @param {string} containerSelector ID do container principal
      * @param {boolean} scrollY Utilizado para indicar se a página deve rolar até o conteúdo
      */
     init(
-        { containerId = 'tabNav', scrollY = false } = {
-            containerId: undefined,
+        { containerSelector = '#tabNav', scrollY = false, startTabId = '' } = {
+            containerSelector: undefined,
             scrollY: undefined,
+            startTabId: undefined,
         }
     ) {
         this.scrollY = scrollY;
+        this.startTabId = startTabId;
 
-        this.containerSelector = `#${containerId}`;
+        this.containerSelector = containerSelector;
         this.tabs = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
         this.tabScroll = document.querySelector(`${this.containerSelector} .js_tabNav_scrollArea`);
 
         if (this.tabs.length > 0) {
+            this.setStartTab();
             this.setMenuItemsListener();
-            this.setTabByHash();
+            this.chooseActiveTab();
             this.addArrowsListener();
+        }
+    }
+
+    setStartTab() {
+        if (this.startTabId) {
+            this.startTab = document.getElementById(this.startTabId);
+        } else {
+            [this.startTab] = this.tabs;
         }
     }
 
@@ -38,7 +49,7 @@ export default class TabNav {
             tab.addEventListener('click', (e) => {
                 if (!tab.classList.contains(this.classActive)) {
                     this.disableCurrentTab();
-                    this.enableNewTab(tab);
+                    this.setActiveTab(tab);
                 }
             });
         });
@@ -59,7 +70,7 @@ export default class TabNav {
         currentTabPanel.classList.remove(this.classActive);
     }
 
-    enableNewTab(tab) {
+    setActiveTab(tab) {
         this.scrollTab(tab);
         const tabPanel = this.getTabPanel(tab);
         tabPanel.classList.add(this.classActive);
@@ -87,16 +98,27 @@ export default class TabNav {
         return document.getElementById(tab.getAttribute('aria-controls'));
     }
 
-    setTabByHash() {
-        const currentHash = window.location.hash;
-
-        if (currentHash !== '') {
-            const tab = document.querySelector(`${this.containerSelector} ${currentHash}`);
-            if (tab) {
-                this.disableCurrentTab();
-                this.enableNewTab(tab);
-            }
+    chooseActiveTab() {
+        if (this.getActiveTabUrlHash()) {
+            this.setTabByHash();
+        } else {
+            this.setActiveTab(this.startTab);
         }
+    }
+
+    setTabByHash() {
+        const activeTab = document.querySelector(
+            `${this.containerSelector} ${this.getActiveTabUrlHash()}`
+        );
+
+        if (activeTab) {
+            this.disableCurrentTab();
+            this.setActiveTab(activeTab);
+        }
+    }
+
+    getActiveTabUrlHash() {
+        return window.location.hash;
     }
 
     addArrowsListener() {
