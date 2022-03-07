@@ -5,7 +5,13 @@ class TabNav {
     constructor() {
         this.createCustomEvents();
 
-        this.classActive = 'is_active';
+        this.statusClasses = {
+            active: 'is_active',
+            loading: {
+                active: 'is_loading',
+                finished: 'is_loaded',
+            },
+        };
     }
 
     /**
@@ -23,15 +29,16 @@ class TabNav {
     ) {
         this.scrollY = scrollY;
         this.startTabId = startTabId;
-
         this.containerSelector = containerSelector;
+
         this.tabs = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
+        this.tabLoading = document.querySelector(`${this.containerSelector} .js_tabNav_loading`);
         this.tabScroll = document.querySelector(`${this.containerSelector} .js_tabNav_scrollArea`);
 
         if (this.tabs.length > 0) {
             this.setStartTab();
-            this.setMenuItemsListener();
             this.chooseActiveTab();
+            this.addTabNavListener();
             this.addArrowsListener();
         }
     }
@@ -44,11 +51,10 @@ class TabNav {
         }
     }
 
-    setMenuItemsListener() {
+    addTabNavListener() {
         this.tabs.forEach((tab) => {
             tab.addEventListener('click', (e) => {
-                if (!tab.classList.contains(this.classActive)) {
-                    this.disableCurrentTab();
+                if (!tab.classList.contains(this.statusClasses.active)) {
                     this.setActiveTab(tab);
                 }
             });
@@ -60,38 +66,69 @@ class TabNav {
             `${this.containerSelector} [aria-selected="true"]`
         );
 
-        this.tabChangeStart.data = currentTab;
-        this.dispatchEvent(this.tabChangeStart);
+        if (currentTab) {
+            this.eventTabChangeStart.data = currentTab;
+            this.dispatchEvent(this.eventTabChangeStart);
 
-        const currentTabPanel = this.getTabPanel(currentTab);
+            const currentTabPanel = this.getTabPanel(currentTab);
 
-        currentTab.classList.remove(this.classActive);
-        currentTab.setAttribute('aria-selected', false);
-        currentTabPanel.classList.remove(this.classActive);
+            currentTab.classList.remove(this.statusClasses.active);
+            currentTab.setAttribute('aria-selected', false);
+            currentTabPanel.classList.remove(this.statusClasses.active);
+        }
     }
 
     setActiveTab(tab) {
-        this.scrollTab(tab);
+        this.disableCurrentTab();
+
         const tabPanel = this.getTabPanel(tab);
-        tabPanel.classList.add(this.classActive);
-        tabPanel.focus({ preventScroll: true });
-        tab.classList.add(this.classActive);
+
+        this.hideLoading();
+        this.tabNavHorizontalScroll(tab);
+
+        tabPanel.classList.add(this.statusClasses.active);
+        tab.classList.add(this.statusClasses.active);
         tab.setAttribute('aria-selected', true);
 
+        this.setUrlHash(tab.id);
+        this.checkLoadingCondition(tab);
+
+        this.eventTabChangeEnd.data = tab;
+        this.dispatchEvent(this.eventTabChangeEnd);
+    }
+
+    setUrlHash(tabId) {
+        const activeTabId = `#${tabId}`;
+
         if (this.scrollY) {
-            window.location.hash = `#${tab.id}`;
+            window.location.hash = activeTabId;
         } else {
             window.history.replaceState(
                 '',
                 document.title,
-                `${window.location.origin}${window.location.pathname}#${tab.id}`
+                `${window.location.origin}${window.location.pathname}${activeTabId}`
             );
         }
+    }
 
-        this.tabChangeEnd.data = tab;
-        this.dispatchEvent(this.tabChangeEnd);
+    checkLoadingCondition(tab) {
+        if (
+            tab.dataset.load &&
+            this.tabLoading &&
+            !tab.classList.contains(this.statusClasses.loading.finished) &&
+            !tab.classList.contains(this.statusClasses.loading.active)
+        ) {
+            tab.classList.add(this.statusClasses.loading.active);
+            this.showLoading();
+        }
+    }
 
-        this.loading.show(tab);
+    hideLoading() {
+        this.tabLoading.classList.remove(this.statusClasses.active);
+    }
+
+    showLoading() {
+        this.tabLoading.classList.add(this.statusClasses.active);
     }
 
     getTabPanel(tab) {
@@ -112,7 +149,6 @@ class TabNav {
         );
 
         if (activeTab) {
-            this.disableCurrentTab();
             this.setActiveTab(activeTab);
         }
     }
@@ -160,7 +196,7 @@ class TabNav {
         }
     }
 
-    scrollTab(tab) {
+    tabNavHorizontalScroll(tab) {
         const tabRect = tab.getBoundingClientRect();
         const screenWidth = window.innerWidth || document.documentElement.clientWidth;
         const scrollSize =
@@ -184,7 +220,7 @@ class TabNav {
         this.removeEventListener = target.removeEventListener.bind(target);
         this.dispatchEvent = target.dispatchEvent.bind(target);
 
-        this.tabChangeStart = new Event('tabChange:start');
-        this.tabChangeEnd = new Event('tabChange:end');
+        this.eventTabChangeStart = new Event('tabChange:start');
+        this.eventTabChangeEnd = new Event('tabChange:end');
     }
 }

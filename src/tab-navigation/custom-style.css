@@ -14,7 +14,18 @@
 }
 
 .tabNav_content {
+	min-height: 50px;
 	padding: 8px;
 
 	border: 1px solid black;
+}
+
+.tabNav_loading {
+	align-items: center;
+	justify-content: center;
+
+	color: white;
+	background-color: black;
+
+	text-align: center;
 }

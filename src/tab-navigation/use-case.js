@@ -1,5 +1,11 @@
 const customTabNav = new TabNav();
 
-customTabNav.init({
-    startTabId: 'tabExample_02',
+customTabNav.addEventListener('tabChange:end', (event) => {
+    if (event.data.id === 'tabExample_02') {
+        setTimeout(() => {
+            customTabNav.hideLoading();
+        }, 2000);
+    }
 });
+
+customTabNav.init();

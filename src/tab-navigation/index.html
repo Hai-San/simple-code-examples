@@ -20,8 +20,8 @@
                             role="tab">
                             Tab title 01
                         </button>
-                        <button aria-controls="example_02" aria-selected="false"
-                            class="tabNav_button is_loadingRequired" id="tabExample_02" role="tab">
+                        <button aria-controls="example_02" aria-selected="false" class="tabNav_button" data-load="true"
+                            id="tabExample_02" role="tab">
                             Tab title 02
                         </button>
                         <button aria-controls="example_03" aria-selected="false" class="tabNav_button"
@@ -33,6 +33,12 @@
             </div>
         </nav>
         <div class="tabNav_content">
+            <div class="tabNav_loading js_tabNav_loading">
+                <span aria-busy="true" aria-labelledby="loading_text" role="alert">
+                    Loading
+                </span>
+            </div>
+
             <span aria-labelledby="tabExample_01" class="tabNav_content_item" id="example_01" role="tabpanel"
                 tabindex="0">
                 Tab content 01
