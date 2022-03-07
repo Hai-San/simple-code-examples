@@ -1,3 +1,11 @@
+.tabNav {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+
+	width: 100%;
+}
+
 .tabNav_header {
 	display: flex;
 
@@ -28,29 +36,11 @@
 }
 
 .tabNav_button {
-
-	@extend %font_14_7_static;
-
-	padding-bottom: $p-xxxs;
-
-	color: $color-text;
-	border-bottom: $p-nano solid transparent;
-
 	cursor: pointer;
+}
 
-	&:not(:first-of-type) {
-		margin-left: $p-md;
-	}
-
-	@include active {
-		border-bottom-color: $color-secondary-pure;
-
-		cursor: default;
-	}
-
-	@include interaction_full {
-		border-bottom-color: $color-secondary-pure;
-	}
+.tabNav_button.is_active {
+	cursor: default;
 }
 
 .tabNav_content {
@@ -58,30 +48,12 @@
 	justify-content: center;
 
 	width: 100%;
-	padding: $v-md 0px;
-
-	background-color: $color-background;
-}
-
-.tabNav_content_item {
-	outline: none;
-
-	@include interaction_focus_visible {
-		outline: none;
-	}
-}
-
-.tabNav_loading {
-	align-items: center;
-	justify-content: center;
-
-	width: 100%;
 }
 
 [role='tabpanel'] {
 	display: none;
+}
 
-	@include active {
-		display: flex;
-	}
+[role='tabpanel'].is_active {
+	display: flex;
 }

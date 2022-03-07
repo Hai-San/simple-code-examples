@@ -4,6 +4,8 @@
 export default class TabNav {
     constructor() {
         this.createCustomEvents();
+
+        this.classActive = 'is_active';
     }
 
     /**
@@ -34,7 +36,7 @@ export default class TabNav {
     setMenuItemsListener() {
         this.tabs.forEach((tab) => {
             tab.addEventListener('click', (e) => {
-                if (!tab.classList.contains(hero.class.active)) {
+                if (!tab.classList.contains(this.classActive)) {
                     this.disableCurrentTab();
                     this.enableNewTab(tab);
                 }
@@ -52,17 +54,17 @@ export default class TabNav {
 
         const currentTabPanel = this.getTabPanel(currentTab);
 
-        currentTab.classList.remove(hero.class.active);
+        currentTab.classList.remove(this.classActive);
         currentTab.setAttribute('aria-selected', false);
-        currentTabPanel.classList.remove(hero.class.active);
+        currentTabPanel.classList.remove(this.classActive);
     }
 
     enableNewTab(tab) {
         this.scrollTab(tab);
         const tabPanel = this.getTabPanel(tab);
-        tabPanel.classList.add(hero.class.active);
+        tabPanel.classList.add(this.classActive);
         tabPanel.focus({ preventScroll: true });
-        tab.classList.add(hero.class.active);
+        tab.classList.add(this.classActive);
         tab.setAttribute('aria-selected', true);
 
         if (this.scrollY) {
