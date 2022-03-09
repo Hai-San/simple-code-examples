@@ -1,10 +1,10 @@
 const customTabNav = new TabNavigation();
 
-customTabNav.addEventListener('tabChange:end', (event) => {
-    if (event.data.id === 'tabExample_02') {
+customTabNav.addEventListener('tabChange:start', (event) => {
+    if (event.data.newTab.id === 'tabExample_02') {
         setTimeout(() => {
-            customTabNav.hideLoading();
-        }, 2000);
+            customTabNav.hideLoading(event.data.newTab);
+        }, 10000);
     }
 });
 

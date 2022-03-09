@@ -33,18 +33,26 @@ class TabNavigation {
         this.startTabId = startTabId;
 
         this.tabButtons = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
-        this.loadingElement = document.querySelector(
-            `${this.containerSelector} .js_tabNav_loading`
-        );
         this.tabMenuScrollContainer = document.querySelector(
             `${this.containerSelector} .js_tabNav_scrollArea`
         );
 
         if (this.tabButtons.length > 0) {
+            this.getLoadingElement();
             this.setStartTab();
             this.findActiveTab();
             this.addTabListener();
             this.addArrowNavigationListener();
+        }
+    }
+
+    getLoadingElement() {
+        this.loadingElement = document.querySelector(
+            `${this.containerSelector} .js_tabNav_loading`
+        );
+
+        if (this.loadingElement) {
+            this.loadingElement.remove();
         }
     }
 
@@ -75,20 +83,21 @@ class TabNavigation {
     /**
      * * Deactivates the previously active tab.
      */
-    disableOldTab() {
-        const currentTab = document.querySelector(
-            `${this.containerSelector} [aria-selected="true"]`
-        );
+    disableOldTab(newTab) {
+        const oldTab = document.querySelector(`${this.containerSelector} [aria-selected="true"]`);
 
-        if (currentTab) {
-            this.eventTabChangeStart.data = currentTab;
+        if (oldTab) {
+            this.eventTabChangeStart.data = {
+                oldTab,
+                newTab,
+            };
             this.dispatchEvent(this.eventTabChangeStart);
 
-            const currentTabPanel = this.getTabPanel(currentTab);
+            const oldTabPanel = this.getTabPanel(oldTab);
 
-            currentTab.classList.remove(this.statusClasses.active);
-            currentTab.setAttribute('aria-selected', false);
-            currentTabPanel.classList.remove(this.statusClasses.active);
+            oldTab.classList.remove(this.statusClasses.active);
+            oldTab.setAttribute('aria-selected', false);
+            oldTabPanel.classList.remove(this.statusClasses.active);
         }
     }
 
@@ -97,11 +106,10 @@ class TabNavigation {
      * @param {*} tab
      */
     setNewActiveTab(tab) {
-        this.disableOldTab();
+        this.disableOldTab(tab);
 
         const tabPanel = this.getTabPanel(tab);
 
-        this.hideLoading();
         this.tabNavHorizontalScroll(tab);
 
         tabPanel.classList.add(this.statusClasses.active);
@@ -109,43 +117,63 @@ class TabNavigation {
         tab.setAttribute('aria-selected', true);
 
         this.setUrlHash(tab.id);
-        this.checkLoadingCondition(tab);
 
-        /**
-         * * Fires the custom event after the tab has been activated
-         */
-        this.eventTabChangeEnd.data = tab;
-        this.dispatchEvent(this.eventTabChangeEnd);
+        if (this.getLoadingCondition(tab)) {
+            this.showLoading(tab);
+        } else {
+            /**
+             * * Fires the custom event after the tab has been activated
+             */
+            this.eventTabChangeEnd.data = tab;
+            this.dispatchEvent(this.eventTabChangeEnd);
+        }
     }
 
     /**
      * * Checks the conditions to show the element that indicates loading.
      * @param {HTMLButtonElement} tab
+     * @return {Boolean}
      */
-    checkLoadingCondition(tab) {
-        if (
+    getLoadingCondition(tab) {
+        return !!(
             tab.dataset.load &&
             this.loadingElement &&
             !tab.classList.contains(this.statusClasses.loading.finished) &&
             !tab.classList.contains(this.statusClasses.loading.active)
-        ) {
-            tab.classList.add(this.statusClasses.loading.active);
-            this.showLoading();
-        }
+        );
     }
 
     /**
      * * Hide the element that indicates that the content of the tab is loading
      */
-    hideLoading() {
+    hideLoading(tab = undefined) {
+        if (tab) {
+            tab.classList.remove(this.statusClasses.loading.active);
+            tab.classList.add(this.statusClasses.loading.finished);
+
+            /**
+             * * Fires the custom event after the tab has been activated
+             */
+            this.eventTabChangeEnd.data = tab;
+            this.dispatchEvent(this.eventTabChangeEnd);
+        }
+
         this.loadingElement.classList.remove(this.statusClasses.active);
+        this.loadingElement.remove();
     }
 
     /**
      * * Shows the element that indicates that the content of the tab is loading
      */
-    showLoading() {
-        this.loadingElement.classList.add(this.statusClasses.active);
+    showLoading(tab) {
+        if (tab) {
+            tab.classList.add(this.statusClasses.loading.active);
+
+            const tabPanel = this.getTabPanel(tab);
+
+            tabPanel.appendChild(this.loadingElement);
+            this.loadingElement.classList.add(this.statusClasses.active);
+        }
     }
 
     /**
