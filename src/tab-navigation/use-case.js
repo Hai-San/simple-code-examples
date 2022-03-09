@@ -1,4 +1,4 @@
-const customTabNav = new TabNav();
+const customTabNav = new TabNavigation();
 
 customTabNav.addEventListener('tabChange:end', (event) => {
     if (event.data.id === 'tabExample_02') {

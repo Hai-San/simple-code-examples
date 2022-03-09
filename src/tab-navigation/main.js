@@ -1,7 +1,7 @@
 /**
  * * Este módulo é responsável por criar uma navegação entre TABS dentro de uma página.
  */
-class TabNav {
+class TabNavigation {
     constructor() {
         this.createCustomEvents();
 
@@ -18,28 +18,32 @@ class TabNav {
      * * Utilizado iniciar um componente de navegação por TAB
      * @param {object}
      * @param {string} containerSelector ID do container principal
-     * @param {boolean} scrollY Utilizado para indicar se a página deve rolar até o conteúdo
+     * @param {boolean} scrollToContent Utilizado para indicar se a página deve rolar até o conteúdo
      */
     init(
-        { containerSelector = '#tabNav', scrollY = false, startTabId = '' } = {
+        { containerSelector = '#tabNav', scrollToContent = false, startTabId = '' } = {
             containerSelector: undefined,
-            scrollY: undefined,
+            scrollToContent: undefined,
             startTabId: undefined,
         }
     ) {
-        this.scrollY = scrollY;
-        this.startTabId = startTabId;
         this.containerSelector = containerSelector;
+        this.scrollToContent = scrollToContent;
+        this.startTabId = startTabId;
 
-        this.tabs = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
-        this.tabLoading = document.querySelector(`${this.containerSelector} .js_tabNav_loading`);
-        this.tabScroll = document.querySelector(`${this.containerSelector} .js_tabNav_scrollArea`);
+        this.tabButtons = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
+        this.loadingElement = document.querySelector(
+            `${this.containerSelector} .js_tabNav_loading`
+        );
+        this.tabMenuScrollContainer = document.querySelector(
+            `${this.containerSelector} .js_tabNav_scrollArea`
+        );
 
-        if (this.tabs.length > 0) {
+        if (this.tabButtons.length > 0) {
             this.setStartTab();
             this.chooseActiveTab();
-            this.addTabNavListener();
-            this.addArrowsListener();
+            this.addTabListener();
+            this.addArrowNavigationListener();
         }
     }
 
@@ -47,12 +51,12 @@ class TabNav {
         if (this.startTabId) {
             this.startTab = document.getElementById(this.startTabId);
         } else {
-            [this.startTab] = this.tabs;
+            [this.startTab] = this.tabButtons;
         }
     }
 
-    addTabNavListener() {
-        this.tabs.forEach((tab) => {
+    addTabListener() {
+        this.tabButtons.forEach((tab) => {
             tab.addEventListener('click', (e) => {
                 if (!tab.classList.contains(this.statusClasses.active)) {
                     this.setActiveTab(tab);
@@ -70,23 +74,23 @@ class TabNav {
             this.eventTabChangeStart.data = currentTab;
             this.dispatchEvent(this.eventTabChangeStart);
 
-            const currentTabPanel = this.getTabPanel(currentTab);
+            const currentTabContent = this.getTabContent(currentTab);
 
             currentTab.classList.remove(this.statusClasses.active);
             currentTab.setAttribute('aria-selected', false);
-            currentTabPanel.classList.remove(this.statusClasses.active);
+            currentTabContent.classList.remove(this.statusClasses.active);
         }
     }
 
     setActiveTab(tab) {
         this.disableCurrentTab();
 
-        const tabPanel = this.getTabPanel(tab);
+        const tabContent = this.getTabContent(tab);
 
         this.hideLoading();
         this.tabNavHorizontalScroll(tab);
 
-        tabPanel.classList.add(this.statusClasses.active);
+        tabContent.classList.add(this.statusClasses.active);
         tab.classList.add(this.statusClasses.active);
         tab.setAttribute('aria-selected', true);
 
@@ -100,7 +104,7 @@ class TabNav {
     setUrlHash(tabId) {
         const activeTabId = `#${tabId}`;
 
-        if (this.scrollY) {
+        if (this.scrollToContent) {
             window.location.hash = activeTabId;
         } else {
             window.history.replaceState(
@@ -114,7 +118,7 @@ class TabNav {
     checkLoadingCondition(tab) {
         if (
             tab.dataset.load &&
-            this.tabLoading &&
+            this.loadingElement &&
             !tab.classList.contains(this.statusClasses.loading.finished) &&
             !tab.classList.contains(this.statusClasses.loading.active)
         ) {
@@ -124,14 +128,14 @@ class TabNav {
     }
 
     hideLoading() {
-        this.tabLoading.classList.remove(this.statusClasses.active);
+        this.loadingElement.classList.remove(this.statusClasses.active);
     }
 
     showLoading() {
-        this.tabLoading.classList.add(this.statusClasses.active);
+        this.loadingElement.classList.add(this.statusClasses.active);
     }
 
-    getTabPanel(tab) {
+    getTabContent(tab) {
         return document.getElementById(tab.getAttribute('aria-controls'));
     }
 
@@ -157,7 +161,7 @@ class TabNav {
         return window.location.hash;
     }
 
-    addArrowsListener() {
+    addArrowNavigationListener() {
         const tabList = document.querySelector(`${this.containerSelector} [role="tablist"]`);
 
         if (tabList) {
@@ -202,9 +206,9 @@ class TabNav {
         const scrollSize =
             tabRect.width - (screenWidth - tabRect.x) + (screenWidth - tabRect.width) / 2;
 
-        const scrollX = this.tabScroll.scrollLeft + scrollSize;
+        const scrollX = this.tabMenuScrollContainer.scrollLeft + scrollSize;
 
-        this.tabScroll.scrollTo({
+        this.tabMenuScrollContainer.scrollTo({
             top: 0,
             left: scrollX,
             behavior: 'smooth',

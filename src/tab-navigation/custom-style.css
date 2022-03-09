@@ -2,6 +2,10 @@
 	min-width: 250px;
 }
 
+.tabNav_button.is_active {
+	background-color: aquamarine;
+}
+
 .tabNav_button:not(:first-of-type) {
 	margin-left: 4px;
 }
