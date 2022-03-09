@@ -21,18 +21,15 @@ class TabNavigation {
      * * Starts the component according to the parameters that were passed
      * @param {object}
      * @param {string} containerSelector ID of the main container that encloses all elements of the TAB navigation component
-     * @param {boolean} scrollToContent Used to indicate whether the page should scroll to the content (This only happens if the page is scrollable.)
      * @param {string} startTabId ID of the tab that will be active when the component starts
      */
     init(
-        { containerSelector = '#tabNav', scrollToContent = false, startTabId = '' } = {
+        { containerSelector = '#tabNav', startTabId = '' } = {
             containerSelector: undefined,
-            scrollToContent: undefined,
             startTabId: undefined,
         }
     ) {
         this.containerSelector = containerSelector;
-        this.scrollToContent = scrollToContent;
         this.startTabId = startTabId;
 
         this.tabButtons = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
@@ -194,20 +191,11 @@ class TabNavigation {
      * @param {string} tabId
      */
     setUrlHash(tabId) {
-        const activeTabId = `#${tabId}`;
-
-        if (this.scrollToContent) {
-            /**
-             * * This only happens if the page is scrollable.
-             */
-            window.location.hash = activeTabId;
-        } else {
-            window.history.replaceState(
-                '',
-                document.title,
-                `${window.location.origin}${window.location.pathname}${activeTabId}`
-            );
-        }
+        window.history.replaceState(
+            '',
+            document.title,
+            `${window.location.origin}${window.location.pathname}#${tabId}`
+        );
     }
 
     /**
