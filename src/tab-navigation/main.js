@@ -1,10 +1,13 @@
 /**
- * * Este módulo é responsável por criar uma navegação entre TABS dentro de uma página.
+ * * This component allows you to create a navigation structure between TABs.
  */
 class TabNavigation {
     constructor() {
         this.createCustomEvents();
 
+        /**
+         * * Object that contains classes used to control certain component conditions
+         */
         this.statusClasses = {
             active: 'is_active',
             loading: {
@@ -15,10 +18,11 @@ class TabNavigation {
     }
 
     /**
-     * * Utilizado iniciar um componente de navegação por TAB
+     * * Starts the component according to the parameters that were passed
      * @param {object}
-     * @param {string} containerSelector ID do container principal
-     * @param {boolean} scrollToContent Utilizado para indicar se a página deve rolar até o conteúdo
+     * @param {string} containerSelector ID of the main container that encloses all elements of the TAB navigation component
+     * @param {boolean} scrollToContent Used to indicate whether the page should scroll to the content (This only happens if the page is scrollable.)
+     * @param {string} startTabId ID of the tab that will be active when the component starts
      */
     init(
         { containerSelector = '#tabNav', scrollToContent = false, startTabId = '' } = {
@@ -41,12 +45,15 @@ class TabNavigation {
 
         if (this.tabButtons.length > 0) {
             this.setStartTab();
-            this.chooseActiveTab();
+            this.findActiveTab();
             this.addTabListener();
             this.addArrowNavigationListener();
         }
     }
 
+    /**
+     * * Sets the tab that will start active when the page loads. (If there is an active URL Hash, the Hash Tab will prevail)
+     */
     setStartTab() {
         if (this.startTabId) {
             this.startTab = document.getElementById(this.startTabId);
@@ -55,17 +62,23 @@ class TabNavigation {
         }
     }
 
+    /**
+     * * Add listen events to tab navigation buttons
+     */
     addTabListener() {
         this.tabButtons.forEach((tab) => {
             tab.addEventListener('click', (e) => {
                 if (!tab.classList.contains(this.statusClasses.active)) {
-                    this.setActiveTab(tab);
+                    this.setNewActiveTab(tab);
                 }
             });
         });
     }
 
-    disableCurrentTab() {
+    /**
+     * * Deactivates the previously active tab.
+     */
+    disableOldTab() {
         const currentTab = document.querySelector(
             `${this.containerSelector} [aria-selected="true"]`
         );
@@ -74,47 +87,44 @@ class TabNavigation {
             this.eventTabChangeStart.data = currentTab;
             this.dispatchEvent(this.eventTabChangeStart);
 
-            const currentTabContent = this.getTabContent(currentTab);
+            const currentTabPanel = this.getTabPanel(currentTab);
 
             currentTab.classList.remove(this.statusClasses.active);
             currentTab.setAttribute('aria-selected', false);
-            currentTabContent.classList.remove(this.statusClasses.active);
+            currentTabPanel.classList.remove(this.statusClasses.active);
         }
     }
 
-    setActiveTab(tab) {
-        this.disableCurrentTab();
+    /**
+     * * Mark the tab that is active and show its respective panel.
+     * @param {*} tab
+     */
+    setNewActiveTab(tab) {
+        this.disableOldTab();
 
-        const tabContent = this.getTabContent(tab);
+        const tabPanel = this.getTabPanel(tab);
 
         this.hideLoading();
         this.tabNavHorizontalScroll(tab);
 
-        tabContent.classList.add(this.statusClasses.active);
+        tabPanel.classList.add(this.statusClasses.active);
         tab.classList.add(this.statusClasses.active);
         tab.setAttribute('aria-selected', true);
 
         this.setUrlHash(tab.id);
         this.checkLoadingCondition(tab);
 
+        /**
+         * * Fires the custom event after the tab has been activated
+         */
         this.eventTabChangeEnd.data = tab;
         this.dispatchEvent(this.eventTabChangeEnd);
     }
 
-    setUrlHash(tabId) {
-        const activeTabId = `#${tabId}`;
-
-        if (this.scrollToContent) {
-            window.location.hash = activeTabId;
-        } else {
-            window.history.replaceState(
-                '',
-                document.title,
-                `${window.location.origin}${window.location.pathname}${activeTabId}`
-            );
-        }
-    }
-
+    /**
+     * * Checks the conditions to show the element that indicates loading.
+     * @param {HTMLButtonElement} tab
+     */
     checkLoadingCondition(tab) {
         if (
             tab.dataset.load &&
@@ -127,40 +137,82 @@ class TabNavigation {
         }
     }
 
+    /**
+     * * Hide the element that indicates that the content of the tab is loading
+     */
     hideLoading() {
         this.loadingElement.classList.remove(this.statusClasses.active);
     }
 
+    /**
+     * * Shows the element that indicates that the content of the tab is loading
+     */
     showLoading() {
         this.loadingElement.classList.add(this.statusClasses.active);
     }
 
-    getTabContent(tab) {
+    /**
+     * * Returns the panel of a tab using the aria controls attribute of the active tab as the panel ID
+     * @param {HTMLButtonElement} tab
+     * @returns {HTMLSpanElement}
+     */
+    getTabPanel(tab) {
         return document.getElementById(tab.getAttribute('aria-controls'));
     }
 
-    chooseActiveTab() {
-        if (this.getActiveTabUrlHash()) {
-            this.setTabByHash();
-        } else {
-            this.setActiveTab(this.startTab);
+    /**
+     * * Finds which Tab should be marked as active
+     */
+    findActiveTab() {
+        let tab = this.startTab;
+
+        if (this.getURLHash()) {
+            tab = this.getTabByURLHash();
         }
+
+        this.setNewActiveTab(tab);
     }
 
-    setTabByHash() {
-        const activeTab = document.querySelector(
-            `${this.containerSelector} ${this.getActiveTabUrlHash()}`
-        );
-
-        if (activeTab) {
-            this.setActiveTab(activeTab);
-        }
+    /**
+     * * Return the tab using the Hash inserted in the URL
+     * @returns {HTMLButtonElement}
+     */
+    getTabByURLHash() {
+        return document.querySelector(`${this.containerSelector} ${this.getURLHash()}`);
     }
 
-    getActiveTabUrlHash() {
+    /**
+     * * Returns the hash that is active in the URL if it exists.
+     * @returns string
+     */
+    getURLHash() {
         return window.location.hash;
     }
 
+    /**
+     * * Insert the Hash of the active tab in the URL
+     * @param {string} tabId
+     */
+    setUrlHash(tabId) {
+        const activeTabId = `#${tabId}`;
+
+        if (this.scrollToContent) {
+            /**
+             * * This only happens if the page is scrollable.
+             */
+            window.location.hash = activeTabId;
+        } else {
+            window.history.replaceState(
+                '',
+                document.title,
+                `${window.location.origin}${window.location.pathname}${activeTabId}`
+            );
+        }
+    }
+
+    /**
+     * * Allows navigation between tab buttons using the left and right arrows.
+     */
     addArrowNavigationListener() {
         const tabList = document.querySelector(`${this.containerSelector} [role="tablist"]`);
 
@@ -200,6 +252,9 @@ class TabNavigation {
         }
     }
 
+    /**
+     * * According to the screen size, a scroll of navigation buttons is created. That way we have a fully responsive menu.
+     */
     tabNavHorizontalScroll(tab) {
         const tabRect = tab.getBoundingClientRect();
         const screenWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -216,7 +271,7 @@ class TabNavigation {
     }
 
     /**
-     * * Create custom events to trigger before and after modal close and open
+     * * Create custom events to trigger before and after tab change
      */
     createCustomEvents() {
         const target = document.createTextNode(null);
