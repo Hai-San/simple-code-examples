@@ -30,7 +30,6 @@ class TabNavigation {
         }
     ) {
         this.containerSelector = containerSelector;
-        this.startTabId = startTabId;
 
         this.tabButtons = document.querySelectorAll(`${this.containerSelector} [role="tab"]`);
         this.tabMenuScrollContainer = document.querySelector(
@@ -38,33 +37,41 @@ class TabNavigation {
         );
 
         if (this.tabButtons.length > 0) {
-            this.getLoadingElement();
-            this.setStartTab();
-            this.findActiveTab();
+            this.startTab = this.getStartTabElement(startTabId);
+
+            this.setupNewTab(this.startTab);
             this.addTabListener();
             this.addArrowNavigationListener();
         }
     }
 
-    getLoadingElement() {
-        this.loadingElement = document.querySelector(
-            `${this.containerSelector} .js_tabNav_loading`
-        );
+    /**
+     * * Get the tab that will start active when the page loads. (If there is an active URL Hash, the Hash Tab will prevail)
+     * @returns {HTMLButtonElement} startTab
+     */
+    getStartTabElement(startTabId) {
+        const activeTabURLHash = this.getActiveTabByURLHash();
+        let [startTab] = this.tabButtons;
 
-        if (this.loadingElement) {
-            this.loadingElement.remove();
+        if (activeTabURLHash) {
+            startTab = activeTabURLHash;
+        } else if (startTabId) {
+            startTab = document.getElementById(startTabId);
         }
+
+        return startTab;
     }
 
     /**
-     * * Sets the tab that will start active when the page loads. (If there is an active URL Hash, the Hash Tab will prevail)
+     * * Returns a tab, if it is active by the Hash in the URL
+     * @returns {HTMLButtonElement, false}
      */
-    setStartTab() {
-        if (this.startTabId) {
-            this.startTab = document.getElementById(this.startTabId);
-        } else {
-            [this.startTab] = this.tabButtons;
+    getActiveTabByURLHash() {
+        if (window.location.hash) {
+            return document.querySelector(`${this.containerSelector} ${window.location.hash}`);
         }
+
+        return false;
     }
 
     /**
@@ -74,7 +81,7 @@ class TabNavigation {
         this.tabButtons.forEach((tab) => {
             tab.addEventListener('click', (e) => {
                 if (!tab.classList.contains(this.statusClasses.active)) {
-                    this.setNewActiveTab(tab);
+                    this.setupNewTab(tab);
                 }
             });
         });
@@ -82,98 +89,64 @@ class TabNavigation {
 
     /**
      * * Deactivates the previously active tab.
+     * @param {HTMLButtonElement} tab
      */
-    disableOldTab(newTab) {
-        const oldTab = document.querySelector(`${this.containerSelector} [aria-selected="true"]`);
+    disableTab(tab) {
+        if (tab) {
+            const tabPanel = this.getTabPanel(tab);
 
-        if (oldTab) {
-            this.eventTabChangeStart.data = {
-                oldTab,
-                newTab,
-            };
-            this.dispatchEvent(this.eventTabChangeStart);
-
-            const oldTabPanel = this.getTabPanel(oldTab);
-
-            oldTab.classList.remove(this.statusClasses.active);
-            oldTab.setAttribute('aria-selected', false);
-            oldTabPanel.classList.remove(this.statusClasses.active);
+            tab.classList.remove(this.statusClasses.active);
+            tab.setAttribute('aria-selected', false);
+            tabPanel.classList.remove(this.statusClasses.active);
         }
     }
 
     /**
-     * * Mark the tab that is active and show its respective panel.
-     * @param {*} tab
+     * * Enables the new active tab.
+     * @param {HTMLButtonElement} tab
      */
-    setNewActiveTab(tab) {
-        this.disableOldTab(tab);
-
+    enableTab(tab) {
         const tabPanel = this.getTabPanel(tab);
-
-        this.tabNavHorizontalScroll(tab);
 
         tabPanel.classList.add(this.statusClasses.active);
         tab.classList.add(this.statusClasses.active);
         tab.setAttribute('aria-selected', true);
-
-        this.setUrlHash(tab.id);
-
-        if (this.getLoadingCondition(tab)) {
-            this.showLoading(tab);
-        } else {
-            /**
-             * * Fires the custom event after the tab has been activated
-             */
-            this.eventTabChangeEnd.data = tab;
-            this.dispatchEvent(this.eventTabChangeEnd);
-        }
     }
 
     /**
-     * * Checks the conditions to show the element that indicates loading.
-     * @param {HTMLButtonElement} tab
-     * @return {Boolean}
+     * * Get current active TAB
+     * @return {HTMLButtonElement}
      */
-    getLoadingCondition(tab) {
-        return !!(
-            tab.dataset.load &&
-            this.loadingElement &&
-            !tab.classList.contains(this.statusClasses.loading.finished) &&
-            !tab.classList.contains(this.statusClasses.loading.active)
-        );
+    getCurrentTab() {
+        return document.querySelector(`${this.containerSelector} [aria-selected="true"]`);
     }
 
     /**
-     * * Hide the element that indicates that the content of the tab is loading
+     * * This method is responsible for firing all the triggers needed to activate a new tab
+     * @param {HTMLButtonElement} newTab
      */
-    hideLoading(tab = undefined) {
-        if (tab) {
-            tab.classList.remove(this.statusClasses.loading.active);
-            tab.classList.add(this.statusClasses.loading.finished);
+    setupNewTab(newTab) {
+        const currentTab = this.getCurrentTab();
+        const tabs = {
+            currentTab,
+            newTab,
+        };
 
-            /**
-             * * Fires the custom event after the tab has been activated
-             */
-            this.eventTabChangeEnd.data = tab;
-            this.dispatchEvent(this.eventTabChangeEnd);
+        this.eventTabChangeStart.data = tabs;
+        this.dispatchEvent(this.eventTabChangeStart);
+
+        this.disableTab(currentTab);
+        this.enableTab(newTab);
+
+        this.tabNavHorizontalScroll(newTab);
+        this.setUrlHash(newTab.id);
+
+        if (this.needLoading(newTab)) {
+            this.showLoading(newTab);
         }
 
-        this.loadingElement.classList.remove(this.statusClasses.active);
-        this.loadingElement.remove();
-    }
-
-    /**
-     * * Shows the element that indicates that the content of the tab is loading
-     */
-    showLoading(tab) {
-        if (tab) {
-            tab.classList.add(this.statusClasses.loading.active);
-
-            const tabPanel = this.getTabPanel(tab);
-
-            tabPanel.appendChild(this.loadingElement);
-            this.loadingElement.classList.add(this.statusClasses.active);
-        }
+        this.eventTabChangeEnd.data = tabs;
+        this.dispatchEvent(this.eventTabChangeEnd);
     }
 
     /**
@@ -183,47 +156,6 @@ class TabNavigation {
      */
     getTabPanel(tab) {
         return document.getElementById(tab.getAttribute('aria-controls'));
-    }
-
-    /**
-     * * Finds which Tab should be marked as active
-     */
-    findActiveTab() {
-        let tab = this.startTab;
-
-        if (this.getURLHash()) {
-            tab = this.getTabByURLHash();
-        }
-
-        this.setNewActiveTab(tab);
-    }
-
-    /**
-     * * Return the tab using the Hash inserted in the URL
-     * @returns {HTMLButtonElement}
-     */
-    getTabByURLHash() {
-        return document.querySelector(`${this.containerSelector} ${this.getURLHash()}`);
-    }
-
-    /**
-     * * Returns the hash that is active in the URL if it exists.
-     * @returns string
-     */
-    getURLHash() {
-        return window.location.hash;
-    }
-
-    /**
-     * * Insert the Hash of the active tab in the URL
-     * @param {string} tabId
-     */
-    setUrlHash(tabId) {
-        window.history.replaceState(
-            '',
-            document.title,
-            `${window.location.origin}${window.location.pathname}#${tabId}`
-        );
     }
 
     /**
@@ -297,5 +229,89 @@ class TabNavigation {
 
         this.eventTabChangeStart = new Event('tabChange:start');
         this.eventTabChangeEnd = new Event('tabChange:end');
+    }
+
+    /**
+     * * Insert the Hash of the active tab in the URL
+     * @param {string} tabId
+     */
+    setUrlHash(tabId) {
+        window.history.replaceState(
+            '',
+            document.title,
+            `${window.location.origin}${window.location.pathname}#${tabId}`
+        );
+    }
+
+    // * Loading methods
+
+    /**
+     * * Returns Loading element if it's exists
+     * @param {string} id Unique ID used to identify the load element
+     * @returns {HTMLBaseElement or false}
+     */
+    getLoadingElement(id) {
+        const loadingElement = document.querySelector(
+            `${this.containerSelector} > .js_tabNav_loading`
+        );
+
+        if (loadingElement) {
+            const newLoadingElement = loadingElement.cloneNode(true);
+            newLoadingElement.dataset.id = id;
+            return newLoadingElement;
+        }
+
+        return false;
+    }
+
+    /**
+     * * Checks if the tab needs to be loaded
+     * @param {HTMLButtonElement} tab
+     * @return {Boolean}
+     */
+    needLoading(tab) {
+        return !!(
+            tab.dataset.load &&
+            !tab.classList.contains(this.statusClasses.loading.finished) &&
+            !tab.classList.contains(this.statusClasses.loading.active)
+        );
+    }
+
+    /**
+     * * Remove loading class
+     * * Adds loaded class
+     * * Remove the element that indicates that the content of the tab is loading
+     * @param {HTMLButtonElement} tab
+     */
+    hideLoading(tab) {
+        if (tab) {
+            const tabLoading = document.querySelector(`.js_tabNav_loading[data-id="${tab.id}"]`);
+
+            tab.classList.remove(this.statusClasses.loading.active);
+            tab.classList.add(this.statusClasses.loading.finished);
+
+            if (tabLoading) {
+                tabLoading.remove();
+            }
+        }
+    }
+
+    /**
+     * * Adds loading class
+     * * Adds the element that indicates that the content of the tab is loading
+     * @param {HTMLButtonElement} tab
+     */
+    showLoading(tab) {
+        const loadingElement = this.getLoadingElement(tab.id);
+
+        if (tab) {
+            tab.classList.add(this.statusClasses.loading.active);
+        }
+
+        if (loadingElement && tab) {
+            const tabPanel = this.getTabPanel(tab);
+            tabPanel.appendChild(loadingElement);
+            loadingElement.classList.add(this.statusClasses.active);
+        }
     }
 }
