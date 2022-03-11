@@ -38,7 +38,6 @@ class TabNavigation {
 
         if (this.tabButtons.length > 0) {
             this.startTab = this.getStartTabElement(startTabId);
-
             this.setupNewTab(this.startTab);
             this.addTabListener();
             this.addArrowNavigationListener();
@@ -111,6 +110,7 @@ class TabNavigation {
         tabPanel.classList.add(this.statusClasses.active);
         tab.classList.add(this.statusClasses.active);
         tab.setAttribute('aria-selected', true);
+        tab.focus();
     }
 
     /**
@@ -219,19 +219,6 @@ class TabNavigation {
     }
 
     /**
-     * * Create custom events to trigger before and after tab change
-     */
-    createCustomEvents() {
-        const target = document.createTextNode(null);
-        this.addEventListener = target.addEventListener.bind(target);
-        this.removeEventListener = target.removeEventListener.bind(target);
-        this.dispatchEvent = target.dispatchEvent.bind(target);
-
-        this.eventTabChangeStart = new Event('tabChange:start');
-        this.eventTabChangeEnd = new Event('tabChange:end');
-    }
-
-    /**
      * * Insert the Hash of the active tab in the URL
      * @param {string} tabId
      */
@@ -293,6 +280,9 @@ class TabNavigation {
             if (tabLoading) {
                 tabLoading.remove();
             }
+
+            this.eventTabLoadEnd.data = tab;
+            this.dispatchEvent(this.eventTabLoadEnd);
         }
     }
 
@@ -305,6 +295,9 @@ class TabNavigation {
         const loadingElement = this.getLoadingElement(tab.id);
 
         if (tab) {
+            this.eventTabLoadStart.data = tab;
+            this.dispatchEvent(this.eventTabLoadStart);
+
             tab.classList.add(this.statusClasses.loading.active);
         }
 
@@ -313,5 +306,20 @@ class TabNavigation {
             tabPanel.appendChild(loadingElement);
             loadingElement.classList.add(this.statusClasses.active);
         }
+    }
+
+    /**
+     * * Create custom events to trigger before and after tab change
+     */
+    createCustomEvents() {
+        const target = document.createTextNode(null);
+        this.addEventListener = target.addEventListener.bind(target);
+        this.removeEventListener = target.removeEventListener.bind(target);
+        this.dispatchEvent = target.dispatchEvent.bind(target);
+
+        this.eventTabChangeStart = new Event('tabChange:start');
+        this.eventTabChangeEnd = new Event('tabChange:end');
+        this.eventTabLoadStart = new Event('tabLoad:start');
+        this.eventTabLoadEnd = new Event('tabLoad:end');
     }
 }
