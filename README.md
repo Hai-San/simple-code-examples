@@ -8,5 +8,6 @@ To use any of the examples, copy and paste the code into your project and adapt 
 
 ### Examples list
 
-- [Modal](/modal)
-- [Tab focus area](/tab-focus-area)
+- [Modal](src/modal/)
+- [Tab focus area](src/tab-focus-area/)
+- [Tab Navgation](src/tab-navigation/)
