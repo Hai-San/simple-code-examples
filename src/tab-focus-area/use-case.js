@@ -1,11 +1,11 @@
 /**
- * * Start new tab navigation area instance
+ * * Start new Focus area instance
  */
 
 const myCustomTabNavigationArea = new TabNavigationArea();
 
 /**
- * * Configure parameters for new navigation area
+ * * Configure parameters for new focus area
  */
 myCustomTabNavigationArea.init({
     containerId: 'container',
@@ -16,7 +16,7 @@ myCustomTabNavigationArea.init({
 });
 
 /**
- * * Configure listeners for navigation area events
+ * * Configure listeners for focus area events
  */
 myCustomTabNavigationArea.addEventListener('area:enter:before', (event) => {
     console.log('Triggers before entering the area');

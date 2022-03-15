@@ -8,12 +8,12 @@
     "scripts": {},
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/MartDSam/tab-navigation-area.git"
+        "url": "git+https://github.com/Hai-San/tab-navigation-area.git"
     },
     "bugs": {
-        "url": "https://github.com/MartDSam/tab-navigation-area/issues"
+        "url": "https://github.com/Hai-San/tab-navigation-area/issues"
     },
-    "homepage": "https://github.com/MartDSam/tab-navigation-area#readme",
+    "homepage": "https://github.com/Hai-San/tab-navigation-area#readme",
     "engines": {
         "node": ">=16.13.0"
     },

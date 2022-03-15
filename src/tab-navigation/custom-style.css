@@ -1,0 +1,35 @@
+.tabNav_button {
+	min-width: 250px;
+}
+
+.tabNav_button.is_active {
+	background-color: aquamarine;
+}
+
+.tabNav_button:not(:first-of-type) {
+	margin-left: 4px;
+}
+
+.tabNav_header {
+	padding: 4px;
+	margin-bottom: 8px;
+
+	border: 1px solid black;
+}
+
+.tabNav_content {
+	min-height: 50px;
+	padding: 8px;
+
+	border: 1px solid black;
+}
+
+.tabNav_loading {
+	align-items: center;
+	justify-content: center;
+
+	color: white;
+	background-color: black;
+
+	text-align: center;
+}

@@ -1,0 +1,78 @@
+.tabNav {
+	display: flex;
+	align-items: flex-start;
+	flex-direction: column;
+
+	width: 100%;
+}
+
+.tabNav_header {
+	display: flex;
+	box-sizing: border-box;
+
+	width: 100%;
+}
+
+.tabNav_scroller {
+	display: block;
+	overflow-y: hidden;
+
+	width: 100%;
+}
+
+.tabNav_scrollArea {
+	display: flex;
+	overflow-x: auto;
+
+	width: 100%;
+}
+
+.tabNav_scrollContent {
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	flex: 1 0 auto;
+}
+
+.tabNav_button {
+	cursor: pointer;
+}
+
+.tabNav_button.is_active {
+	cursor: default;
+}
+
+.tabNav_content {
+	position: relative;
+
+	display: flex;
+	box-sizing: border-box;
+
+	width: 100%;
+}
+
+.tabNav_loading {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 2;
+
+	display: none;
+
+	width: 100%;
+	height: 100%;
+}
+
+.tabNav_loading.is_active {
+	display: flex;
+}
+
+[role='tabpanel'] {
+	display: none;
+}
+
+[role='tabpanel'].is_active {
+	display: flex;
+}

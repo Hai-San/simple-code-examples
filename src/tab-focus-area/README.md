@@ -1,6 +1,7 @@
 # Tab focus area
 Script that forces TAB navigation within a specific area. Navigation will loop within the given area.
 
-### Main files:
+### Core files:
+Core files are essential for the component to function.
 
-- [JS](https://github.com/MartDSam/simple-code-examples/blob/main/src/tab-focus-area/main.js)
+- [JS](main.js)

@@ -7,10 +7,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tab Navigation</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="custom-style.css">
 </head>
 
 <body>
+    <!-- Main HTML structure of TAB Navigation START -->
+    <div class="tabNav" id="myCustomTabNav">
+        <nav class="tabNav_header">
+            <div class="tabNav_scroller">
+                <div class="tabNav_scrollArea js_tabNav_scrollArea">
+                    <div aria-orientation="horizontal" class="tabNav_scrollContent" role="tablist">
+                        <button aria-controls="example_01" aria-selected="true" class="tabNav_button" id="tabExample_01"
+                            role="tab">
+                            Tab title 01
+                        </button>
+                        <button aria-controls="example_02" aria-selected="false" class="tabNav_button" data-load="true"
+                            id="tabExample_02" role="tab">
+                            Tab title 02
+                        </button>
+                        <button aria-controls="example_03" aria-selected="false" class="tabNav_button"
+                            id="tabExample_03" role="tab">
+                            Tab title 03
+                        </button>
+                        <button aria-controls="example_04" aria-selected="false" class="tabNav_button" data-load="true"
+                            id="tabExample_04" role="tab">
+                            Tab title 04
+                        </button>
+                        <button aria-controls="example_05" aria-selected="false" class="tabNav_button"
+                            id="tabExample_05" role="tab">
+                            Tab title 05
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="tabNav_content">
+            <span aria-labelledby="tabExample_01" class="tabNav_content_item" id="example_01" role="tabpanel"
+                tabindex="0">
+                Tab content 01
+            </span>
+            <span aria-labelledby="tabExample_02" class="tabNav_content_item" id="example_02" role="tabpanel"
+                tabindex="0">
+                Tab content 02 - Contains asynchronous content and needs to wait for loading.
+            </span>
+            <span aria-labelledby="tabExample_03" class="tabNav_content_item" id="example_03" role="tabpanel"
+                tabindex="0">
+                Tab content 03
+            </span>
+            <span aria-labelledby="tabExample_04" class="tabNav_content_item" id="example_04" role="tabpanel"
+                tabindex="0">
+                Tab content 04 - Contains asynchronous content and needs to wait for loading.
+            </span>
+            <span aria-labelledby="tabExample_05" class="tabNav_content_item" id="example_05" role="tabpanel"
+                tabindex="0">
+                Tab content 05
+            </span>
+        </div>
+        <div class="tabNav_loading js_tabNav_loading">
+            <span aria-busy="true" aria-labelledby="loading_text" role="alert">
+                Loading
+            </span>
+        </div>
+    </div>
+    <!-- Main HTML structure of TAB Navigation END -->
 </body>
 <script src="main.js"></script>
+<script src="use-case.js"></script>
 
 </html>
